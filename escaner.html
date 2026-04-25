@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escáner de Etiquetas</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f4f2; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; }
+    h1 { font-size: 1.4rem; font-weight: 600; color: #1a1a18; margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+    .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+    .container { width: 100%; max-width: 580px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .conn-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 10px; border-radius: 100px; margin-bottom: 1.25rem; font-weight: 500; }
+    .conn-badge.ok { background: #eaf3de; color: #27500a; }
+    .conn-badge.err { background: #fcebeb; color: #a32d2d; }
+    .conn-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .conn-badge.ok .conn-dot { background: #3b6d11; }
+    .conn-badge.err .conn-dot { background: #a32d2d; }
+
+    .driver-card { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 2rem; text-align: center; margin-bottom: 1.25rem; }
+    .driver-card h2 { font-size: 1.1rem; font-weight: 600; color: #1a1a18; margin-bottom: 0.4rem; }
+    .driver-card p { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+    .driver-card input[type="text"] { width: 100%; height: 52px; padding: 0 16px; font-size: 16px; border: 1.5px solid #ccc; border-radius: 10px; background: #fff; outline: none; text-align: center; margin-bottom: 1rem; transition: border-color 0.15s; }
+    .driver-card input[type="text"]:focus { border-color: #378add; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+    .btn-start { width: 100%; height: 52px; font-size: 16px; font-weight: 700; background: #1a1a18; color: #fff; border: none; border-radius: 10px; cursor: pointer; }
+    .btn-start:hover { background: #333; }
+
+    .reporte-card { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 1.25rem; }
+    .reporte-card h3 { font-size: 14px; font-weight: 600; color: #1a1a18; margin-bottom: 1rem; }
+    .fecha-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .fecha-row label { font-size: 12px; color: #888; }
+    .fecha-row input[type="date"] { height: 38px; padding: 0 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; background: #fff; outline: none; flex: 1; min-width: 130px; }
+    .btn-reporte { height: 38px; padding: 0 16px; font-size: 13px; font-weight: 600; background: #1e6f3e; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+    .btn-reporte:hover { background: #155230; }
+
+    .driver-banner { display: flex; align-items: center; justify-content: space-between; background: #e6f1fb; border: 1px solid #85b7eb; border-radius: 12px; padding: 12px 16px; margin-bottom: 1.25rem; }
+    .driver-banner-left { display: flex; align-items: center; gap: 10px; }
+    .driver-avatar { width: 36px; height: 36px; border-radius: 50%; background: #378add; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .driver-name { font-size: 15px; font-weight: 600; color: #042c53; }
+    .driver-seq { font-size: 12px; color: #185fa5; margin-top: 1px; }
+    .btn-cerrar { height: 36px; padding: 0 14px; font-size: 13px; font-weight: 600; background: #a32d2d; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+    .btn-cerrar:hover { background: #791f1f; }
+
+    .reopen-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; background: #faeeda; color: #633806; border: 1px solid #ef9f27; border-radius: 8px; padding: 6px 12px; margin-bottom: 1rem; font-weight: 500; }
+
+    .banner { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: 12px; margin-bottom: 1.25rem; background: #eaf3de; border: 1px solid #97c459; }
+    .banner .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; background: #3b6d11; }
+    .banner .msg-title { font-size: 14px; font-weight: 600; color: #27500a; }
+
+    .input-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+    input[type="text"].scan-input { flex: 1; height: 48px; padding: 0 14px; font-size: 15px; font-family: 'Courier New', monospace; border: 1px solid #ccc; border-radius: 8px; background: #fff; outline: none; transition: border-color 0.15s; }
+    input[type="text"].scan-input:focus { border-color: #378add; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+    button.btn-reg { height: 48px; padding: 0 22px; font-size: 14px; font-weight: 600; background: #1a1a18; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    button.btn-reg:hover { background: #333; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+    .stat-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 12px; text-align: center; }
+    .stat-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: #1a1a18; }
+    .stat-card.danger .stat-value { color: #a32d2d; }
+    .stat-card.success .stat-value { color: #27500a; }
+
+    .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .list-header span { font-size: 13px; color: #666; font-weight: 500; }
+    .lista { background: #fff; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; min-height: 60px; max-height: 340px; overflow-y: auto; }
+    .vacio { padding: 2rem; text-align: center; color: #aaa; font-size: 14px; }
+
+    .item { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px 9px 16px; border-bottom: 1px solid #f0f0ee; animation: slideIn 0.2s ease; gap: 8px; }
+    .item:last-child { border-bottom: none; }
+    .item-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .item-dot.ok { background: #3b6d11; }
+    .item-dot.dup { background: #a32d2d; }
+    .item-code { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 600; color: #1a1a18; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: 100px; font-weight: 600; }
+    .badge.ok { background: #eaf3de; color: #27500a; }
+    .badge.dup { background: #fcebeb; color: #a32d2d; }
+    .item-hora { font-size: 11px; color: #aaa; }
+    .btn-del { width: 26px; height: 26px; border-radius: 6px; border: none; background: #f4f4f2; color: #aaa; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, color 0.15s; }
+    .btn-del:hover { background: #fcebeb; color: #a32d2d; }
+
+    .historial-section { margin-top: 1.5rem; }
+    .historial-title { font-size: 13px; color: #666; font-weight: 500; margin-bottom: 8px; }
+    .historial-lista { display: flex; flex-direction: column; gap: 8px; }
+    .hist-item { background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+    .hist-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; gap: 10px; }
+    .hist-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .hist-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1a1a18; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .hist-name { font-size: 14px; font-weight: 600; color: #1a1a18; }
+    .hist-detail { font-size: 12px; color: #888; margin-top: 1px; }
+    .hist-center { text-align: right; flex-shrink: 0; }
+    .hist-paq { font-size: 1.1rem; font-weight: 700; color: #1a1a18; }
+    .hist-dups { font-size: 11px; color: #a32d2d; }
+    .hist-dups.none { color: #3b6d11; }
+    .hist-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-reabrir { height: 30px; padding: 0 10px; font-size: 12px; font-weight: 600; background: #e6f1fb; color: #185fa5; border: 1px solid #85b7eb; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+    .btn-reabrir:hover { background: #b5d4f4; }
+    .btn-ver { height: 30px; padding: 0 10px; font-size: 12px; font-weight: 600; background: #f4f4f2; color: #555; border: 1px solid #ccc; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+    .btn-ver:hover { background: #e8e8e6; }
+    .hist-paquetes { border-top: 1px solid #f0f0ee; max-height: 220px; overflow-y: auto; display: none; }
+    .hist-paquetes.open { display: block; }
+    .hist-pkg-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid #f8f8f6; gap: 8px; }
+    .hist-pkg-item:last-child { border-bottom: none; }
+    .hist-pkg-code { font-family: 'Courier New', monospace; font-size: 12px; color: #1a1a18; flex: 1; }
+    .btn-del-hist { width: 24px; height: 24px; border-radius: 5px; border: none; background: #f4f4f2; color: #aaa; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, color 0.15s; }
+    .btn-del-hist:hover { background: #fcebeb; color: #a32d2d; }
+
+    .sep { height: 1.5rem; }
+    .footer { margin-top: 2rem; font-size: 12px; color: #bbb; text-align: center; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Escáner de Etiquetas</h1>
+  <p class="subtitle">Control de distribución por chofer</p>
+
+  <div id="conn-badge" class="conn-badge err">
+    <div class="conn-dot"></div>
+    <span id="conn-text">Conectando...</span>
+  </div>
+
+  <div class="screen active" id="screen-driver">
+    <div class="driver-card">
+      <h2>¿Quién es el chofer?</h2>
+      <p>Ingresa el nombre antes de comenzar a escanear</p>
+      <input type="text" id="input-chofer" placeholder="Nombre del chofer..." autocomplete="off" />
+      <button class="btn-start" onclick="iniciarChofer()">Comenzar escaneo</button>
+    </div>
+    <div class="sep"></div>
+    <div class="reporte-card">
+      <h3>Reporte semanal</h3>
+      <div class="fecha-row">
+        <label>Desde</label><input type="date" id="fecha-desde" />
+        <label>Hasta</label><input type="date" id="fecha-hasta" />
+        <button class="btn-reporte" onclick="descargarReporte()">⬇ Descargar Excel</button>
+      </div>
+    </div>
+    <div class="historial-section" id="historial-section" style="display:none;">
+      <div class="sep"></div>
+      <div class="historial-title">Choferes del día</div>
+      <div class="historial-lista" id="historial-lista"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-scan">
+    <div id="reopen-badge" class="reopen-badge" style="display:none;">⚠ Ruta reabierta — continúa escaneando normalmente</div>
+    <div class="driver-banner">
+      <div class="driver-banner-left">
+        <div class="driver-avatar" id="chofer-avatar">—</div>
+        <div>
+          <div class="driver-name" id="chofer-nombre">—</div>
+          <div class="driver-seq" id="chofer-seq">Ruta en curso</div>
+        </div>
+      </div>
+      <button class="btn-cerrar" onclick="cerrarRuta()">Cerrar ruta</button>
+    </div>
+    <div class="banner"><div class="dot"></div><div class="msg-title">Sistema listo — escanea una etiqueta</div></div>
+    <div class="input-row">
+      <input type="text" class="scan-input" id="input-codigo" placeholder="Escanea código de barras o QR..." autocomplete="off" />
+      <button class="btn-reg" onclick="escanear()">Registrar</button>
+    </div>
+    <div class="stats">
+      <div class="stat-card success"><div class="stat-label">Paquetes únicos</div><div class="stat-value" id="stat-unicos">0</div></div>
+      <div class="stat-card danger"><div class="stat-label">Duplicados</div><div class="stat-value" id="stat-dups">0</div></div>
+      <div class="stat-card"><div class="stat-label">Total escaneos</div><div class="stat-value" id="stat-total">0</div></div>
+    </div>
+    <div class="list-header"><span>Registro de esta ruta</span></div>
+    <div class="lista" id="lista"><div class="vacio" id="vacio">Sin registros aún</div></div>
+  </div>
+</div>
+<div class="footer">Sistema en la nube · Datos guardados automáticamente</div>
+
+<script>
+  // API apunta al mismo servidor que sirve este HTML
+  var API = window.location.origin;
+
+  var choferes = [];
+  var rutaActual = null;
+  var rutaNum = 0;
+  var globalIndex = {};
+  var esRutaReanudada = false;
+
+  function verificarServidor() {
+    fetch(API + '/dias')
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        document.getElementById('conn-badge').className = 'conn-badge ok';
+        document.getElementById('conn-text').textContent = 'Conectado · datos guardados en la nube';
+        cargarDiaActual();
+      })
+      .catch(function(){
+        document.getElementById('conn-badge').className = 'conn-badge err';
+        document.getElementById('conn-text').textContent = 'Sin conexión — verifica tu internet';
+        setTimeout(verificarServidor, 4000);
+      });
+  }
+
+  function hoyStr() {
+    var d = new Date();
+    return String(d.getDate()).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.getFullYear();
+  }
+
+  function cargarDiaActual() {
+    fetch(API + '/dia?fecha=' + hoyStr())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        choferes = data.choferes || [];
+        rutaNum = choferes.length;
+        for (var i=0; i<choferes.length; i++) {
+          var ch = choferes[i];
+          if (ch.codigos) {
+            for (var j=0; j<ch.codigos.length; j++) {
+              globalIndex[ch.codigos[j]] = { chofer:ch.nombre, rutaNum:ch.ruta_num };
+            }
+          }
+        }
+        actualizarHistorial();
+      }).catch(function(){});
+  }
+
+  function guardarRutaNueva(ruta) {
+    return fetch(API+'/ruta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ruta)});
+  }
+  function actualizarRutaEnServidor(ruta) {
+    return fetch(API+'/ruta',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({fecha:hoyStr(),ruta_num:ruta.ruta_num,ruta:ruta})});
+  }
+  function eliminarPaqueteServidor(ruta_num, codigo) {
+    return fetch(API+'/paquete',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({fecha:hoyStr(),ruta_num:ruta_num,codigo:codigo})});
+  }
+
+  function iniciales(n){ return n.trim().split(' ').map(function(p){return p[0];}).join('').toUpperCase().slice(0,2); }
+  function formatHora(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+  function extraerID(raw){
+    var match = raw.match(/\bid[^0-9]*(\d+)/i);
+    if (match) return match[1];
+    return raw.trim().toUpperCase();
+  }
+  function playBeep(tipo){
+    try {
+      var ctx=new(window.AudioContext||window.webkitAudioContext)();
+      var osc=ctx.createOscillator();var gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      if(tipo==='dup'){osc.frequency.value=220;osc.type='square';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.7);osc.start();osc.stop(ctx.currentTime+0.7);}
+      else{osc.frequency.value=880;osc.type='sine';gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);osc.start();osc.stop(ctx.currentTime+0.15);}
+    }catch(e){}
+  }
+
+  function iniciarChofer(){
+    var nombre=document.getElementById('input-chofer').value.trim();
+    if(!nombre){alert('Por favor ingresa el nombre del chofer.');return;}
+    rutaNum++;
+    rutaActual={nombre:nombre,rutaNum:rutaNum,ruta_num:rutaNum,inicio:Date.now(),registros:{},orden:[],keyCounter:0,totalEscaneos:0,totalDups:0};
+    esRutaReanudada=false;
+    abrirPantallaEscaneo();
+  }
+  document.getElementById('input-chofer').addEventListener('keydown',function(e){if(e.key==='Enter')iniciarChofer();});
+
+  function reabrirRuta(idx){
+    var ch=choferes[idx];
+    if(!confirm('¿Reabrir la ruta de '+ch.nombre+' para agregar o eliminar paquetes?'))return;
+    rutaActual={nombre:ch.nombre,rutaNum:ch.ruta_num,ruta_num:ch.ruta_num,inicio:ch._inicio_ts||Date.now(),registros:{},orden:ch.codigos?ch.codigos.slice():[],keyCounter:ch.codigos?ch.codigos.length:0,totalEscaneos:ch.total_escaneos||0,totalDups:ch.duplicados||0};
+    if(ch.codigos){
+      for(var i=0;i<ch.codigos.length;i++){
+        var cod=ch.codigos[i];
+        rutaActual.registros[cod]={primera:ch._inicio_ts||Date.now(),count:1,k:i+1};
+        globalIndex[cod]={chofer:ch.nombre,rutaNum:ch.ruta_num};
+      }
+    }
+    choferes.splice(idx,1);
+    esRutaReanudada=true;
+    abrirPantallaEscaneo();
+  }
+
+  function abrirPantallaEscaneo(){
+    document.getElementById('chofer-avatar').textContent=iniciales(rutaActual.nombre);
+    document.getElementById('chofer-nombre').textContent=rutaActual.nombre;
+    document.getElementById('chofer-seq').textContent='Ruta #'+rutaActual.rutaNum+(esRutaReanudada?' · reabierta':' · iniciada '+formatHora(rutaActual.inicio));
+    document.getElementById('reopen-badge').style.display=esRutaReanudada?'inline-flex':'none';
+    var lista=document.getElementById('lista');
+    lista.innerHTML='';
+    if(rutaActual.orden.length===0){lista.innerHTML='<div class="vacio" id="vacio">Sin registros aún</div>';}
+    else{for(var i=0;i<rutaActual.orden.length;i++){var cod=rutaActual.orden[i];var k=rutaActual.registros[cod]?rutaActual.registros[cod].k:i+1;renderItemActivo(lista,cod,k,'cargado',false);}}
+    actualizarStats();
+    document.getElementById('screen-driver').classList.remove('active');
+    document.getElementById('screen-scan').classList.add('active');
+    setTimeout(function(){document.getElementById('input-codigo').focus();},100);
+  }
+
+  function renderItemActivo(lista,codigo,k,hora,prepend){
+    var div=document.createElement('div');
+    div.className='item';div.id='item'+k;
+    div.innerHTML='<div class="item-left"><div class="item-dot ok" id="dot'+k+'"></div><span class="item-code">'+codigo+'</span></div><div class="item-right"><span class="badge ok" id="badge'+k+'">1 vez</span><span class="item-hora">'+hora+'</span><button class="btn-del" title="Eliminar">✕</button></div>';
+    div.querySelector('.btn-del').addEventListener('click',function(){eliminarDeActivo(codigo,k);});
+    if(prepend&&lista.firstChild)lista.insertBefore(div,lista.firstChild);
+    else lista.appendChild(div);
+  }
+
+  function eliminarDeActivo(codigo,k){
+    if(!confirm('¿Eliminar el paquete '+codigo+' de esta ruta?'))return;
+    var idx=rutaActual.orden.indexOf(codigo);
+    if(idx!==-1){rutaActual.orden.splice(idx,1);delete rutaActual.registros[codigo];delete globalIndex[codigo];rutaActual.totalEscaneos=Math.max(0,rutaActual.totalEscaneos-1);}
+    var el=document.getElementById('item'+k);
+    if(el)el.remove();
+    if(rutaActual.orden.length===0)document.getElementById('lista').innerHTML='<div class="vacio" id="vacio">Sin registros aún</div>';
+    actualizarStats();
+  }
+
+  function escanear(){
+    var input=document.getElementById('input-codigo');
+    var raw=input.value;if(!raw.trim())return;input.value='';
+    var codigo=extraerID(raw);var ahora=Date.now();
+    rutaActual.totalEscaneos++;
+    if(globalIndex[codigo]){
+      var origen=globalIndex[codigo];rutaActual.totalDups++;playBeep('dup');
+      if(rutaActual.registros[codigo]){rutaActual.registros[codigo].count++;actualizarItemBadge(codigo);}
+      actualizarStats();
+      var msg='⚠️ ETIQUETA DUPLICADA\n\nCódigo: '+codigo+'\n\n';
+      if(origen.rutaNum===rutaActual.rutaNum)msg+='Esta etiqueta ya fue escaneada en esta misma ruta.\n';
+      else msg+='Esta etiqueta ya fue escaneada en la ruta de:\n👤 '+origen.chofer+' (Ruta #'+origen.rutaNum+')\n';
+      msg+='\nRetira el paquete y avisa al supervisor.';
+      alert(msg);
+    } else {
+      rutaActual.keyCounter++;var k=rutaActual.keyCounter;
+      rutaActual.registros[codigo]={primera:ahora,count:1,k:k};
+      rutaActual.orden.unshift(codigo);
+      globalIndex[codigo]={chofer:rutaActual.nombre,rutaNum:rutaActual.rutaNum};
+      playBeep('ok');
+      var vacio=document.getElementById('vacio');if(vacio)vacio.parentNode.removeChild(vacio);
+      renderItemActivo(document.getElementById('lista'),codigo,k,formatHora(ahora),true);
+      actualizarStats();
+    }
+    input.focus();
+  }
+
+  function actualizarStats(){
+    document.getElementById('stat-unicos').textContent=rutaActual.orden.length;
+    document.getElementById('stat-dups').textContent=rutaActual.totalDups;
+    document.getElementById('stat-total').textContent=rutaActual.totalEscaneos;
+  }
+  function actualizarItemBadge(codigo){
+    var count=rutaActual.registros[codigo].count;var k=rutaActual.registros[codigo].k;
+    var badge=document.getElementById('badge'+k);var dot=document.getElementById('dot'+k);
+    if(badge){badge.textContent=count+' veces';badge.className='badge dup';}
+    if(dot)dot.className='item-dot dup';
+  }
+  document.getElementById('input-codigo').addEventListener('keydown',function(e){if(e.key==='Enter')escanear();});
+
+  function cerrarRuta(){
+    if(rutaActual.orden.length===0){if(!confirm('Esta ruta no tiene paquetes. ¿Cerrar igual?'))return;}
+    else{if(!confirm('¿Cerrar la ruta de '+rutaActual.nombre+'?\n\nPaquetes: '+rutaActual.orden.length+'\nDuplicados: '+rutaActual.totalDups))return;}
+    rutaActual.fin=Date.now();
+    var rutaGuardar={nombre:rutaActual.nombre,ruta_num:rutaActual.rutaNum,fecha:hoyStr(),hora_inicio:formatHora(rutaActual.inicio),hora_fin:formatHora(rutaActual.fin),_inicio_ts:rutaActual.inicio,paquetes_unicos:rutaActual.orden.length,duplicados:rutaActual.totalDups,total_escaneos:rutaActual.totalEscaneos,codigos:rutaActual.orden.slice()};
+    if(esRutaReanudada)actualizarRutaEnServidor(rutaGuardar).catch(function(){alert('No se pudo guardar.');});
+    else guardarRutaNueva(rutaGuardar).catch(function(){alert('No se pudo guardar.');});
+    choferes.push(rutaGuardar);rutaActual=null;esRutaReanudada=false;
+    document.getElementById('screen-scan').classList.remove('active');
+    document.getElementById('screen-driver').classList.add('active');
+    document.getElementById('input-chofer').value='';
+    actualizarHistorial();
+    setTimeout(function(){document.getElementById('input-chofer').focus();},100);
+  }
+
+  function actualizarHistorial(){
+    if(choferes.length===0)return;
+    document.getElementById('historial-section').style.display='block';
+    var lista=document.getElementById('historial-lista');lista.innerHTML='';
+    for(var i=choferes.length-1;i>=0;i--){
+      (function(idx){
+        var c=choferes[idx];
+        var dups=c.totalDups!==undefined?c.totalDups:(c.duplicados||0);
+        var paq=c.orden?c.orden.length:(c.paquetes_unicos||0);
+        var rutaN=c.rutaNum||c.ruta_num;
+        var hi=c.hora_inicio||(c.inicio?formatHora(c.inicio):'');
+        var hf=c.hora_fin||(c.fin?formatHora(c.fin):'');
+        var codigos=c.codigos||c.orden||[];
+        var wrap=document.createElement('div');wrap.className='hist-item';
+        var header=document.createElement('div');header.className='hist-header';
+        header.innerHTML='<div class="hist-left"><div class="hist-avatar">'+iniciales(c.nombre)+'</div><div><div class="hist-name">'+c.nombre+'</div><div class="hist-detail">Ruta #'+rutaN+' · '+hi+' – '+hf+'</div></div></div><div class="hist-center"><div class="hist-paq" id="hist-paq-'+rutaN+'">'+paq+' paq.</div><div class="hist-dups '+(dups>0?'':'none')+'">'+(dups>0?dups+' dup.':'Sin dup.')+'</div></div><div class="hist-actions"><button class="btn-ver">Ver</button><button class="btn-reabrir">Reabrir</button></div>';
+        var pkgList=document.createElement('div');pkgList.className='hist-paquetes';pkgList.id='pkgs-'+rutaN;
+        function renderPkgList(){
+          pkgList.innerHTML='';
+          var cods=choferes[idx].codigos||choferes[idx].orden||[];
+          if(cods.length===0){pkgList.innerHTML='<div class="vacio" style="padding:1rem;">Sin paquetes</div>';return;}
+          for(var j=0;j<cods.length;j++){
+            (function(cod){
+              var row=document.createElement('div');row.className='hist-pkg-item';row.id='hpkg-'+rutaN+'-'+cod;
+              row.innerHTML='<span class="hist-pkg-code">'+cod+'</span><button class="btn-del-hist" title="Eliminar">✕</button>';
+              row.querySelector('.btn-del-hist').addEventListener('click',function(){eliminarDeCerrada(idx,rutaN,cod,renderPkgList);});
+              pkgList.appendChild(row);
+            })(cods[j]);
+          }
+        }
+        renderPkgList();
+        header.querySelector('.btn-ver').addEventListener('click',function(){pkgList.classList.toggle('open');});
+        header.querySelector('.btn-reabrir').addEventListener('click',function(){reabrirRuta(idx);});
+        wrap.appendChild(header);wrap.appendChild(pkgList);lista.appendChild(wrap);
+      })(i);
+    }
+  }
+
+  function eliminarDeCerrada(idx,rutaN,codigo,callback){
+    if(!confirm('¿Eliminar el paquete '+codigo+' de la ruta de '+choferes[idx].nombre+'?'))return;
+    var cods=choferes[idx].codigos||choferes[idx].orden||[];
+    var pos=cods.indexOf(codigo);if(pos!==-1)cods.splice(pos,1);
+    if(choferes[idx].codigos)choferes[idx].codigos=cods;
+    if(choferes[idx].orden)choferes[idx].orden=cods;
+    choferes[idx].paquetes_unicos=cods.length;
+    choferes[idx].total_escaneos=Math.max(0,(choferes[idx].total_escaneos||1)-1);
+    delete globalIndex[codigo];
+    var paqEl=document.getElementById('hist-paq-'+rutaN);if(paqEl)paqEl.textContent=cods.length+' paq.';
+    actualizarRutaEnServidor(choferes[idx]).catch(function(){alert('No se pudo guardar.');});
+    if(callback)callback();
+  }
+
+  function descargarReporte(){
+    var desde=document.getElementById('fecha-desde').value;
+    var hasta=document.getElementById('fecha-hasta').value;
+    if(!desde||!hasta){alert('Por favor selecciona las fechas.');return;}
+    function conv(f){var p=f.split('-');return p[2]+'-'+p[1]+'-'+p[0];}
+    window.location.href=API+'/reporte?desde='+conv(desde)+'&hasta='+conv(hasta);
+  }
+
+  (function(){
+    var hoy=new Date();
+    var yyyy=hoy.getFullYear(),mm=String(hoy.getMonth()+1).padStart(2,'0'),dd=String(hoy.getDate()).padStart(2,'0');
+    document.getElementById('fecha-hasta').value=yyyy+'-'+mm+'-'+dd;
+    var lunes=new Date(hoy);lunes.setDate(hoy.getDate()-hoy.getDay()+1);
+    document.getElementById('fecha-desde').value=lunes.getFullYear()+'-'+String(lunes.getMonth()+1).padStart(2,'0')+'-'+String(lunes.getDate()).padStart(2,'0');
+  })();
+
+  verificarServidor();
+</script>
+</body>
+</html>
