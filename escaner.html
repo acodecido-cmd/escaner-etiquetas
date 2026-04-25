@@ -1,3 +1,6 @@
+Escaner · HTML
+Copiar
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,14 +15,14 @@
     .container { width: 100%; max-width: 580px; }
     .screen { display: none; }
     .screen.active { display: block; }
-
+ 
     .conn-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 10px; border-radius: 100px; margin-bottom: 1.25rem; font-weight: 500; }
     .conn-badge.ok { background: #eaf3de; color: #27500a; }
     .conn-badge.err { background: #fcebeb; color: #a32d2d; }
     .conn-dot { width: 7px; height: 7px; border-radius: 50%; }
     .conn-badge.ok .conn-dot { background: #3b6d11; }
     .conn-badge.err .conn-dot { background: #a32d2d; }
-
+ 
     .driver-card { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 2rem; text-align: center; margin-bottom: 1.25rem; }
     .driver-card h2 { font-size: 1.1rem; font-weight: 600; color: #1a1a18; margin-bottom: 0.4rem; }
     .driver-card p { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
@@ -27,7 +30,19 @@
     .driver-card input[type="text"]:focus { border-color: #378add; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
     .btn-start { width: 100%; height: 52px; font-size: 16px; font-weight: 700; background: #1a1a18; color: #fff; border: none; border-radius: 10px; cursor: pointer; }
     .btn-start:hover { background: #333; }
-
+ 
+    /* CERRAR DÍA */
+    .cerrar-dia-card { background: #fff; border: 2px solid #1a1a18; border-radius: 14px; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 1.25rem; }
+    .cerrar-dia-card.cerrado { border-color: #3b6d11; background: #eaf3de; }
+    .cerrar-dia-info { flex: 1; }
+    .cerrar-dia-titulo { font-size: 14px; font-weight: 700; color: #1a1a18; }
+    .cerrar-dia-sub { font-size: 12px; color: #888; margin-top: 2px; }
+    .cerrar-dia-card.cerrado .cerrar-dia-titulo { color: #27500a; }
+    .btn-cerrar-dia { height: 44px; padding: 0 20px; font-size: 14px; font-weight: 700; background: #1a1a18; color: #fff; border: none; border-radius: 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .btn-cerrar-dia:hover { background: #333; }
+    .btn-descargar-dia { height: 44px; padding: 0 20px; font-size: 14px; font-weight: 700; background: #1e6f3e; color: #fff; border: none; border-radius: 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .btn-descargar-dia:hover { background: #155230; }
+ 
     .reporte-card { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 1.25rem; }
     .reporte-card h3 { font-size: 14px; font-weight: 600; color: #1a1a18; margin-bottom: 1rem; }
     .fecha-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -35,7 +50,33 @@
     .fecha-row input[type="date"] { height: 38px; padding: 0 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; background: #fff; outline: none; flex: 1; min-width: 130px; }
     .btn-reporte { height: 38px; padding: 0 16px; font-size: 13px; font-weight: 600; background: #1e6f3e; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; }
     .btn-reporte:hover { background: #155230; }
-
+ 
+    /* MODAL RESUMEN DÍA */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; align-items: center; justify-content: center; }
+    .modal-overlay.visible { display: flex; }
+    .modal { background: #fff; border-radius: 16px; padding: 2rem; max-width: 420px; width: 92%; animation: popIn 0.2s ease; }
+    .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+    .modal-icon { width: 48px; height: 48px; border-radius: 12px; background: #eaf3de; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .modal-titulo { font-size: 1.1rem; font-weight: 700; color: #1a1a18; }
+    .modal-fecha { font-size: 12px; color: #888; margin-top: 2px; }
+    .modal-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+    .modal-stat { background: #f4f4f2; border-radius: 10px; padding: 12px; text-align: center; }
+    .modal-stat-val { font-size: 1.6rem; font-weight: 700; color: #1a1a18; }
+    .modal-stat-val.red { color: #a32d2d; }
+    .modal-stat-lab { font-size: 11px; color: #888; margin-top: 2px; }
+    .modal-tabla { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 13px; }
+    .modal-tabla th { text-align: left; padding: 8px 10px; background: #1a1a18; color: #fff; font-weight: 600; }
+    .modal-tabla th:last-child { text-align: center; }
+    .modal-tabla td { padding: 8px 10px; border-bottom: 1px solid #f0f0ee; color: #1a1a18; }
+    .modal-tabla td:last-child { text-align: center; font-weight: 600; }
+    .modal-tabla tr:last-child td { border-bottom: none; }
+    .modal-tabla .dup { color: #a32d2d; }
+    .modal-btns { display: flex; gap: 8px; }
+    .modal-btn-dl { flex: 1; height: 48px; font-size: 14px; font-weight: 700; background: #1e6f3e; color: #fff; border: none; border-radius: 10px; cursor: pointer; }
+    .modal-btn-dl:hover { background: #155230; }
+    .modal-btn-close { height: 48px; padding: 0 20px; font-size: 14px; font-weight: 600; background: #f4f4f2; color: #555; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; }
+    .modal-btn-close:hover { background: #e8e8e6; }
+ 
     .driver-banner { display: flex; align-items: center; justify-content: space-between; background: #e6f1fb; border: 1px solid #85b7eb; border-radius: 12px; padding: 12px 16px; margin-bottom: 1.25rem; }
     .driver-banner-left { display: flex; align-items: center; gap: 10px; }
     .driver-avatar { width: 36px; height: 36px; border-radius: 50%; background: #378add; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
@@ -43,31 +84,31 @@
     .driver-seq { font-size: 12px; color: #185fa5; margin-top: 1px; }
     .btn-cerrar { height: 36px; padding: 0 14px; font-size: 13px; font-weight: 600; background: #a32d2d; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; }
     .btn-cerrar:hover { background: #791f1f; }
-
+ 
     .reopen-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; background: #faeeda; color: #633806; border: 1px solid #ef9f27; border-radius: 8px; padding: 6px 12px; margin-bottom: 1rem; font-weight: 500; }
-
+ 
     .banner { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: 12px; margin-bottom: 1.25rem; background: #eaf3de; border: 1px solid #97c459; }
     .banner .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; background: #3b6d11; }
     .banner .msg-title { font-size: 14px; font-weight: 600; color: #27500a; }
-
+ 
     .input-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
     input[type="text"].scan-input { flex: 1; height: 48px; padding: 0 14px; font-size: 15px; font-family: 'Courier New', monospace; border: 1px solid #ccc; border-radius: 8px; background: #fff; outline: none; transition: border-color 0.15s; }
     input[type="text"].scan-input:focus { border-color: #378add; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
     button.btn-reg { height: 48px; padding: 0 22px; font-size: 14px; font-weight: 600; background: #1a1a18; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
     button.btn-reg:hover { background: #333; }
-
+ 
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
     .stat-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 12px; text-align: center; }
     .stat-label { font-size: 11px; color: #888; margin-bottom: 3px; }
     .stat-value { font-size: 1.5rem; font-weight: 700; color: #1a1a18; }
     .stat-card.danger .stat-value { color: #a32d2d; }
     .stat-card.success .stat-value { color: #27500a; }
-
+ 
     .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .list-header span { font-size: 13px; color: #666; font-weight: 500; }
     .lista { background: #fff; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; min-height: 60px; max-height: 340px; overflow-y: auto; }
     .vacio { padding: 2rem; text-align: center; color: #aaa; font-size: 14px; }
-
+ 
     .item { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px 9px 16px; border-bottom: 1px solid #f0f0ee; animation: slideIn 0.2s ease; gap: 8px; }
     .item:last-child { border-bottom: none; }
     .item-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
@@ -82,7 +123,7 @@
     .item-hora { font-size: 11px; color: #aaa; }
     .btn-del { width: 26px; height: 26px; border-radius: 6px; border: none; background: #f4f4f2; color: #aaa; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, color 0.15s; }
     .btn-del:hover { background: #fcebeb; color: #a32d2d; }
-
+ 
     .historial-section { margin-top: 1.5rem; }
     .historial-title { font-size: 13px; color: #666; font-weight: 500; margin-bottom: 8px; }
     .historial-lista { display: flex; flex-direction: column; gap: 8px; }
@@ -108,30 +149,88 @@
     .hist-pkg-code { font-family: 'Courier New', monospace; font-size: 12px; color: #1a1a18; flex: 1; }
     .btn-del-hist { width: 24px; height: 24px; border-radius: 5px; border: none; background: #f4f4f2; color: #aaa; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, color 0.15s; }
     .btn-del-hist:hover { background: #fcebeb; color: #a32d2d; }
-
-    .sep { height: 1.5rem; }
+ 
+    .sep { height: 1.25rem; }
     .footer { margin-top: 2rem; font-size: 12px; color: #bbb; text-align: center; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+ 
+    @keyframes popIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
   </style>
 </head>
 <body>
+ 
+<!-- Modal resumen del día -->
+<div class="modal-overlay" id="modal-dia">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon">📦</div>
+      <div>
+        <div class="modal-titulo">Resumen del día</div>
+        <div class="modal-fecha" id="modal-dia-fecha">—</div>
+      </div>
+    </div>
+    <div class="modal-stats">
+      <div class="modal-stat">
+        <div class="modal-stat-val" id="modal-choferes">0</div>
+        <div class="modal-stat-lab">Choferes</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-val" id="modal-paquetes">0</div>
+        <div class="modal-stat-lab">Paquetes únicos</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-val red" id="modal-duplicados">0</div>
+        <div class="modal-stat-lab">Duplicados</div>
+      </div>
+    </div>
+    <table class="modal-tabla">
+      <thead>
+        <tr>
+          <th>Chofer</th>
+          <th>Hora</th>
+          <th>Paquetes</th>
+          <th>Dups</th>
+        </tr>
+      </thead>
+      <tbody id="modal-tabla-body"></tbody>
+    </table>
+    <div class="modal-btns">
+      <button class="modal-btn-dl" onclick="descargarReporteDia()">⬇ Descargar Excel</button>
+      <button class="modal-btn-close" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+ 
 <div class="container">
   <h1>Escáner de Etiquetas</h1>
   <p class="subtitle">Control de distribución por chofer</p>
-
+ 
   <div id="conn-badge" class="conn-badge err">
     <div class="conn-dot"></div>
     <span id="conn-text">Conectando...</span>
   </div>
-
+ 
+  <!-- PANTALLA 1: Chofer -->
   <div class="screen active" id="screen-driver">
+ 
+    <!-- Cerrar día -->
+    <div class="cerrar-dia-card" id="cerrar-dia-card">
+      <div class="cerrar-dia-info">
+        <div class="cerrar-dia-titulo" id="cerrar-dia-titulo">Cerrar día</div>
+        <div class="cerrar-dia-sub" id="cerrar-dia-sub">Genera el informe completo del día</div>
+      </div>
+      <button class="btn-cerrar-dia" id="btn-cerrar-dia" onclick="cerrarDia()">Cerrar día</button>
+    </div>
+ 
     <div class="driver-card">
       <h2>¿Quién es el chofer?</h2>
       <p>Ingresa el nombre antes de comenzar a escanear</p>
       <input type="text" id="input-chofer" placeholder="Nombre del chofer..." autocomplete="off" />
       <button class="btn-start" onclick="iniciarChofer()">Comenzar escaneo</button>
     </div>
+ 
     <div class="sep"></div>
+ 
     <div class="reporte-card">
       <h3>Reporte semanal</h3>
       <div class="fecha-row">
@@ -140,13 +239,15 @@
         <button class="btn-reporte" onclick="descargarReporte()">⬇ Descargar Excel</button>
       </div>
     </div>
+ 
     <div class="historial-section" id="historial-section" style="display:none;">
       <div class="sep"></div>
       <div class="historial-title">Choferes del día</div>
       <div class="historial-lista" id="historial-lista"></div>
     </div>
   </div>
-
+ 
+  <!-- PANTALLA 2: Escaneo -->
   <div class="screen" id="screen-scan">
     <div id="reopen-badge" class="reopen-badge" style="display:none;">⚠ Ruta reabierta — continúa escaneando normalmente</div>
     <div class="driver-banner">
@@ -173,116 +274,145 @@
     <div class="lista" id="lista"><div class="vacio" id="vacio">Sin registros aún</div></div>
   </div>
 </div>
+ 
 <div class="footer">Sistema en la nube · Datos guardados automáticamente</div>
-
+ 
 <script>
-  // API apunta al mismo servidor que sirve este HTML
   var API = window.location.origin;
-
   var choferes = [];
   var rutaActual = null;
   var rutaNum = 0;
   var globalIndex = {};
   var esRutaReanudada = false;
-
+  var diaCerrado = false;
+  var rutasDelDia = [];
+ 
   function verificarServidor() {
-    fetch(API + '/dias')
-      .then(function(r){ return r.json(); })
-      .then(function(){
-        document.getElementById('conn-badge').className = 'conn-badge ok';
-        document.getElementById('conn-text').textContent = 'Conectado · datos guardados en la nube';
-        cargarDiaActual();
-      })
-      .catch(function(){
-        document.getElementById('conn-badge').className = 'conn-badge err';
-        document.getElementById('conn-text').textContent = 'Sin conexión — verifica tu internet';
-        setTimeout(verificarServidor, 4000);
-      });
+    fetch(API+'/dias').then(function(r){return r.json();}).then(function(){
+      document.getElementById('conn-badge').className='conn-badge ok';
+      document.getElementById('conn-text').textContent='Conectado · datos guardados en la nube';
+      cargarDiaActual();
+    }).catch(function(){
+      document.getElementById('conn-badge').className='conn-badge err';
+      document.getElementById('conn-text').textContent='Sin conexión — verifica tu internet';
+      setTimeout(verificarServidor,4000);
+    });
   }
-
-  function hoyStr() {
-    var d = new Date();
+ 
+  function hoyStr(){
+    var d=new Date();
     return String(d.getDate()).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.getFullYear();
   }
-
-  function cargarDiaActual() {
-    fetch(API + '/dia?fecha=' + hoyStr())
-      .then(function(r){ return r.json(); })
+ 
+  function cargarDiaActual(){
+    fetch(API+'/dia?fecha='+hoyStr()).then(function(r){return r.json();}).then(function(data){
+      choferes=data.choferes||[];
+      rutaNum=choferes.length;
+      rutasDelDia=choferes.slice();
+      diaCerrado=data.cerrado||false;
+      for(var i=0;i<choferes.length;i++){
+        var ch=choferes[i];
+        if(ch.codigos){for(var j=0;j<ch.codigos.length;j++){globalIndex[ch.codigos[j]]={chofer:ch.nombre,rutaNum:ch.ruta_num};}}
+      }
+      actualizarEstadoCierreDia();
+      actualizarHistorial();
+    }).catch(function(){});
+  }
+ 
+  function actualizarEstadoCierreDia(){
+    var card=document.getElementById('cerrar-dia-card');
+    var btn=document.getElementById('btn-cerrar-dia');
+    var titulo=document.getElementById('cerrar-dia-titulo');
+    var sub=document.getElementById('cerrar-dia-sub');
+    if(diaCerrado){
+      card.className='cerrar-dia-card cerrado';
+      titulo.textContent='✓ Día cerrado';
+      sub.textContent='El informe del día fue generado';
+      btn.textContent='Ver informe';
+      btn.className='btn-descargar-dia';
+      btn.onclick=function(){ mostrarModalDia(choferes); };
+    } else {
+      card.className='cerrar-dia-card';
+      titulo.textContent='Cerrar día';
+      sub.textContent=choferes.length>0 ? choferes.length+' ruta'+(choferes.length>1?'s':'')+' completada'+(choferes.length>1?'s':'') : 'Genera el informe completo del día';
+      btn.textContent='Cerrar día';
+      btn.className='btn-cerrar-dia';
+      btn.onclick=cerrarDia;
+    }
+  }
+ 
+  function cerrarDia(){
+    if(choferes.length===0){alert('No hay rutas cerradas hoy para generar el informe.');return;}
+    if(!confirm('¿Cerrar el día?\n\nSe generará el informe con '+choferes.length+' chofer'+(choferes.length>1?'es':'')+' y '+choferes.reduce(function(a,c){return a+(c.paquetes_unicos||0);},0)+' paquetes.'))return;
+    fetch(API+'/cerrar-dia',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fecha:hoyStr()})})
+      .then(function(r){return r.json();})
       .then(function(data){
-        choferes = data.choferes || [];
-        rutaNum = choferes.length;
-        for (var i=0; i<choferes.length; i++) {
-          var ch = choferes[i];
-          if (ch.codigos) {
-            for (var j=0; j<ch.codigos.length; j++) {
-              globalIndex[ch.codigos[j]] = { chofer:ch.nombre, rutaNum:ch.ruta_num };
-            }
-          }
-        }
-        actualizarHistorial();
-      }).catch(function(){});
+        if(data.error){alert(data.error);return;}
+        diaCerrado=true;
+        rutasDelDia=data.rutas||choferes;
+        actualizarEstadoCierreDia();
+        mostrarModalDia(rutasDelDia);
+      }).catch(function(){alert('No se pudo cerrar el día. Verifica la conexión.');});
   }
-
-  function guardarRutaNueva(ruta) {
-    return fetch(API+'/ruta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ruta)});
+ 
+  function mostrarModalDia(rutas){
+    var total_paq=rutas.reduce(function(a,c){return a+(c.paquetes_unicos||0);},0);
+    var total_dups=rutas.reduce(function(a,c){return a+(c.duplicados||0);},0);
+    document.getElementById('modal-dia-fecha').textContent=hoyStr();
+    document.getElementById('modal-choferes').textContent=rutas.length;
+    document.getElementById('modal-paquetes').textContent=total_paq;
+    document.getElementById('modal-duplicados').textContent=total_dups;
+    var tbody=document.getElementById('modal-tabla-body');
+    tbody.innerHTML='';
+    for(var i=0;i<rutas.length;i++){
+      var r=rutas[i];
+      var tr=document.createElement('tr');
+      var dupClass=r.duplicados>0?'dup':'';
+      tr.innerHTML='<td>'+r.nombre+'</td><td>'+(r.hora_inicio||'—')+' – '+(r.hora_fin||'—')+'</td><td>'+( r.paquetes_unicos||0)+'</td><td class="'+dupClass+'">'+(r.duplicados||0)+'</td>';
+      tbody.appendChild(tr);
+    }
+    document.getElementById('modal-dia').classList.add('visible');
   }
-  function actualizarRutaEnServidor(ruta) {
-    return fetch(API+'/ruta',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({fecha:hoyStr(),ruta_num:ruta.ruta_num,ruta:ruta})});
+ 
+  function cerrarModal(){
+    document.getElementById('modal-dia').classList.remove('visible');
   }
-  function eliminarPaqueteServidor(ruta_num, codigo) {
-    return fetch(API+'/paquete',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({fecha:hoyStr(),ruta_num:ruta_num,codigo:codigo})});
+ 
+  function descargarReporteDia(){
+    window.location.href=API+'/reporte-dia?fecha='+hoyStr();
   }
-
-  function iniciales(n){ return n.trim().split(' ').map(function(p){return p[0];}).join('').toUpperCase().slice(0,2); }
-  function formatHora(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
-  function extraerID(raw){
-    var match = raw.match(/\bid[^0-9]*(\d+)/i);
-    if (match) return match[1];
-    return raw.trim().toUpperCase();
-  }
-  function playBeep(tipo){
-    try {
-      var ctx=new(window.AudioContext||window.webkitAudioContext)();
-      var osc=ctx.createOscillator();var gain=ctx.createGain();
-      osc.connect(gain);gain.connect(ctx.destination);
-      if(tipo==='dup'){osc.frequency.value=220;osc.type='square';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.7);osc.start();osc.stop(ctx.currentTime+0.7);}
-      else{osc.frequency.value=880;osc.type='sine';gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);osc.start();osc.stop(ctx.currentTime+0.15);}
-    }catch(e){}
-  }
-
+ 
+  function guardarRutaNueva(ruta){return fetch(API+'/ruta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ruta)});}
+  function actualizarRutaEnServidor(ruta){return fetch(API+'/ruta',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({fecha:hoyStr(),ruta_num:ruta.ruta_num,ruta:ruta})});}
+ 
+  function iniciales(n){return n.trim().split(' ').map(function(p){return p[0];}).join('').toUpperCase().slice(0,2);}
+  function formatHora(ts){return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+  function extraerID(raw){var m=raw.match(/\bid[^0-9]*(\d+)/i);if(m)return m[1];return raw.trim().toUpperCase();}
+  function playBeep(tipo){try{var ctx=new(window.AudioContext||window.webkitAudioContext)();var osc=ctx.createOscillator();var gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);if(tipo==='dup'){osc.frequency.value=220;osc.type='square';gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.7);osc.start();osc.stop(ctx.currentTime+0.7);}else{osc.frequency.value=880;osc.type='sine';gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);osc.start();osc.stop(ctx.currentTime+0.15);}}catch(e){}}
+ 
   function iniciarChofer(){
     var nombre=document.getElementById('input-chofer').value.trim();
     if(!nombre){alert('Por favor ingresa el nombre del chofer.');return;}
     rutaNum++;
     rutaActual={nombre:nombre,rutaNum:rutaNum,ruta_num:rutaNum,inicio:Date.now(),registros:{},orden:[],keyCounter:0,totalEscaneos:0,totalDups:0};
-    esRutaReanudada=false;
-    abrirPantallaEscaneo();
+    esRutaReanudada=false;abrirPantallaEscaneo();
   }
   document.getElementById('input-chofer').addEventListener('keydown',function(e){if(e.key==='Enter')iniciarChofer();});
-
+ 
   function reabrirRuta(idx){
     var ch=choferes[idx];
-    if(!confirm('¿Reabrir la ruta de '+ch.nombre+' para agregar o eliminar paquetes?'))return;
+    if(!confirm('¿Reabrir la ruta de '+ch.nombre+'?'))return;
     rutaActual={nombre:ch.nombre,rutaNum:ch.ruta_num,ruta_num:ch.ruta_num,inicio:ch._inicio_ts||Date.now(),registros:{},orden:ch.codigos?ch.codigos.slice():[],keyCounter:ch.codigos?ch.codigos.length:0,totalEscaneos:ch.total_escaneos||0,totalDups:ch.duplicados||0};
-    if(ch.codigos){
-      for(var i=0;i<ch.codigos.length;i++){
-        var cod=ch.codigos[i];
-        rutaActual.registros[cod]={primera:ch._inicio_ts||Date.now(),count:1,k:i+1};
-        globalIndex[cod]={chofer:ch.nombre,rutaNum:ch.ruta_num};
-      }
-    }
-    choferes.splice(idx,1);
-    esRutaReanudada=true;
-    abrirPantallaEscaneo();
+    if(ch.codigos){for(var i=0;i<ch.codigos.length;i++){var cod=ch.codigos[i];rutaActual.registros[cod]={primera:ch._inicio_ts||Date.now(),count:1,k:i+1};globalIndex[cod]={chofer:ch.nombre,rutaNum:ch.ruta_num};}}
+    choferes.splice(idx,1);esRutaReanudada=true;abrirPantallaEscaneo();
   }
-
+ 
   function abrirPantallaEscaneo(){
     document.getElementById('chofer-avatar').textContent=iniciales(rutaActual.nombre);
     document.getElementById('chofer-nombre').textContent=rutaActual.nombre;
     document.getElementById('chofer-seq').textContent='Ruta #'+rutaActual.rutaNum+(esRutaReanudada?' · reabierta':' · iniciada '+formatHora(rutaActual.inicio));
     document.getElementById('reopen-badge').style.display=esRutaReanudada?'inline-flex':'none';
-    var lista=document.getElementById('lista');
-    lista.innerHTML='';
+    var lista=document.getElementById('lista');lista.innerHTML='';
     if(rutaActual.orden.length===0){lista.innerHTML='<div class="vacio" id="vacio">Sin registros aún</div>';}
     else{for(var i=0;i<rutaActual.orden.length;i++){var cod=rutaActual.orden[i];var k=rutaActual.registros[cod]?rutaActual.registros[cod].k:i+1;renderItemActivo(lista,cod,k,'cargado',false);}}
     actualizarStats();
@@ -290,31 +420,26 @@
     document.getElementById('screen-scan').classList.add('active');
     setTimeout(function(){document.getElementById('input-codigo').focus();},100);
   }
-
+ 
   function renderItemActivo(lista,codigo,k,hora,prepend){
-    var div=document.createElement('div');
-    div.className='item';div.id='item'+k;
+    var div=document.createElement('div');div.className='item';div.id='item'+k;
     div.innerHTML='<div class="item-left"><div class="item-dot ok" id="dot'+k+'"></div><span class="item-code">'+codigo+'</span></div><div class="item-right"><span class="badge ok" id="badge'+k+'">1 vez</span><span class="item-hora">'+hora+'</span><button class="btn-del" title="Eliminar">✕</button></div>';
     div.querySelector('.btn-del').addEventListener('click',function(){eliminarDeActivo(codigo,k);});
-    if(prepend&&lista.firstChild)lista.insertBefore(div,lista.firstChild);
-    else lista.appendChild(div);
+    if(prepend&&lista.firstChild)lista.insertBefore(div,lista.firstChild);else lista.appendChild(div);
   }
-
+ 
   function eliminarDeActivo(codigo,k){
-    if(!confirm('¿Eliminar el paquete '+codigo+' de esta ruta?'))return;
+    if(!confirm('¿Eliminar el paquete '+codigo+'?'))return;
     var idx=rutaActual.orden.indexOf(codigo);
     if(idx!==-1){rutaActual.orden.splice(idx,1);delete rutaActual.registros[codigo];delete globalIndex[codigo];rutaActual.totalEscaneos=Math.max(0,rutaActual.totalEscaneos-1);}
-    var el=document.getElementById('item'+k);
-    if(el)el.remove();
+    var el=document.getElementById('item'+k);if(el)el.remove();
     if(rutaActual.orden.length===0)document.getElementById('lista').innerHTML='<div class="vacio" id="vacio">Sin registros aún</div>';
     actualizarStats();
   }
-
+ 
   function escanear(){
-    var input=document.getElementById('input-codigo');
-    var raw=input.value;if(!raw.trim())return;input.value='';
-    var codigo=extraerID(raw);var ahora=Date.now();
-    rutaActual.totalEscaneos++;
+    var input=document.getElementById('input-codigo');var raw=input.value;if(!raw.trim())return;input.value='';
+    var codigo=extraerID(raw);var ahora=Date.now();rutaActual.totalEscaneos++;
     if(globalIndex[codigo]){
       var origen=globalIndex[codigo];rutaActual.totalDups++;playBeep('dup');
       if(rutaActual.registros[codigo]){rutaActual.registros[codigo].count++;actualizarItemBadge(codigo);}
@@ -322,21 +447,17 @@
       var msg='⚠️ ETIQUETA DUPLICADA\n\nCódigo: '+codigo+'\n\n';
       if(origen.rutaNum===rutaActual.rutaNum)msg+='Esta etiqueta ya fue escaneada en esta misma ruta.\n';
       else msg+='Esta etiqueta ya fue escaneada en la ruta de:\n👤 '+origen.chofer+' (Ruta #'+origen.rutaNum+')\n';
-      msg+='\nRetira el paquete y avisa al supervisor.';
-      alert(msg);
+      msg+='\nRetira el paquete y avisa al supervisor.';alert(msg);
     } else {
       rutaActual.keyCounter++;var k=rutaActual.keyCounter;
-      rutaActual.registros[codigo]={primera:ahora,count:1,k:k};
-      rutaActual.orden.unshift(codigo);
+      rutaActual.registros[codigo]={primera:ahora,count:1,k:k};rutaActual.orden.unshift(codigo);
       globalIndex[codigo]={chofer:rutaActual.nombre,rutaNum:rutaActual.rutaNum};
-      playBeep('ok');
-      var vacio=document.getElementById('vacio');if(vacio)vacio.parentNode.removeChild(vacio);
-      renderItemActivo(document.getElementById('lista'),codigo,k,formatHora(ahora),true);
-      actualizarStats();
+      playBeep('ok');var vacio=document.getElementById('vacio');if(vacio)vacio.parentNode.removeChild(vacio);
+      renderItemActivo(document.getElementById('lista'),codigo,k,formatHora(ahora),true);actualizarStats();
     }
     input.focus();
   }
-
+ 
   function actualizarStats(){
     document.getElementById('stat-unicos').textContent=rutaActual.orden.length;
     document.getElementById('stat-dups').textContent=rutaActual.totalDups;
@@ -345,11 +466,10 @@
   function actualizarItemBadge(codigo){
     var count=rutaActual.registros[codigo].count;var k=rutaActual.registros[codigo].k;
     var badge=document.getElementById('badge'+k);var dot=document.getElementById('dot'+k);
-    if(badge){badge.textContent=count+' veces';badge.className='badge dup';}
-    if(dot)dot.className='item-dot dup';
+    if(badge){badge.textContent=count+' veces';badge.className='badge dup';}if(dot)dot.className='item-dot dup';
   }
   document.getElementById('input-codigo').addEventListener('keydown',function(e){if(e.key==='Enter')escanear();});
-
+ 
   function cerrarRuta(){
     if(rutaActual.orden.length===0){if(!confirm('Esta ruta no tiene paquetes. ¿Cerrar igual?'))return;}
     else{if(!confirm('¿Cerrar la ruta de '+rutaActual.nombre+'?\n\nPaquetes: '+rutaActual.orden.length+'\nDuplicados: '+rutaActual.totalDups))return;}
@@ -361,10 +481,10 @@
     document.getElementById('screen-scan').classList.remove('active');
     document.getElementById('screen-driver').classList.add('active');
     document.getElementById('input-chofer').value='';
-    actualizarHistorial();
+    actualizarEstadoCierreDia();actualizarHistorial();
     setTimeout(function(){document.getElementById('input-chofer').focus();},100);
   }
-
+ 
   function actualizarHistorial(){
     if(choferes.length===0)return;
     document.getElementById('historial-section').style.display='block';
@@ -381,19 +501,11 @@
         var wrap=document.createElement('div');wrap.className='hist-item';
         var header=document.createElement('div');header.className='hist-header';
         header.innerHTML='<div class="hist-left"><div class="hist-avatar">'+iniciales(c.nombre)+'</div><div><div class="hist-name">'+c.nombre+'</div><div class="hist-detail">Ruta #'+rutaN+' · '+hi+' – '+hf+'</div></div></div><div class="hist-center"><div class="hist-paq" id="hist-paq-'+rutaN+'">'+paq+' paq.</div><div class="hist-dups '+(dups>0?'':'none')+'">'+(dups>0?dups+' dup.':'Sin dup.')+'</div></div><div class="hist-actions"><button class="btn-ver">Ver</button><button class="btn-reabrir">Reabrir</button></div>';
-        var pkgList=document.createElement('div');pkgList.className='hist-paquetes';pkgList.id='pkgs-'+rutaN;
+        var pkgList=document.createElement('div');pkgList.className='hist-paquetes';
         function renderPkgList(){
-          pkgList.innerHTML='';
-          var cods=choferes[idx].codigos||choferes[idx].orden||[];
+          pkgList.innerHTML='';var cods=choferes[idx].codigos||choferes[idx].orden||[];
           if(cods.length===0){pkgList.innerHTML='<div class="vacio" style="padding:1rem;">Sin paquetes</div>';return;}
-          for(var j=0;j<cods.length;j++){
-            (function(cod){
-              var row=document.createElement('div');row.className='hist-pkg-item';row.id='hpkg-'+rutaN+'-'+cod;
-              row.innerHTML='<span class="hist-pkg-code">'+cod+'</span><button class="btn-del-hist" title="Eliminar">✕</button>';
-              row.querySelector('.btn-del-hist').addEventListener('click',function(){eliminarDeCerrada(idx,rutaN,cod,renderPkgList);});
-              pkgList.appendChild(row);
-            })(cods[j]);
-          }
+          for(var j=0;j<cods.length;j++){(function(cod){var row=document.createElement('div');row.className='hist-pkg-item';row.innerHTML='<span class="hist-pkg-code">'+cod+'</span><button class="btn-del-hist">✕</button>';row.querySelector('.btn-del-hist').addEventListener('click',function(){eliminarDeCerrada(idx,rutaN,cod,renderPkgList);});pkgList.appendChild(row);})(cods[j]);}
         }
         renderPkgList();
         header.querySelector('.btn-ver').addEventListener('click',function(){pkgList.classList.toggle('open');});
@@ -402,37 +514,33 @@
       })(i);
     }
   }
-
+ 
   function eliminarDeCerrada(idx,rutaN,codigo,callback){
-    if(!confirm('¿Eliminar el paquete '+codigo+' de la ruta de '+choferes[idx].nombre+'?'))return;
+    if(!confirm('¿Eliminar el paquete '+codigo+'?'))return;
     var cods=choferes[idx].codigos||choferes[idx].orden||[];
     var pos=cods.indexOf(codigo);if(pos!==-1)cods.splice(pos,1);
-    if(choferes[idx].codigos)choferes[idx].codigos=cods;
-    if(choferes[idx].orden)choferes[idx].orden=cods;
-    choferes[idx].paquetes_unicos=cods.length;
-    choferes[idx].total_escaneos=Math.max(0,(choferes[idx].total_escaneos||1)-1);
+    if(choferes[idx].codigos)choferes[idx].codigos=cods;if(choferes[idx].orden)choferes[idx].orden=cods;
+    choferes[idx].paquetes_unicos=cods.length;choferes[idx].total_escaneos=Math.max(0,(choferes[idx].total_escaneos||1)-1);
     delete globalIndex[codigo];
     var paqEl=document.getElementById('hist-paq-'+rutaN);if(paqEl)paqEl.textContent=cods.length+' paq.';
     actualizarRutaEnServidor(choferes[idx]).catch(function(){alert('No se pudo guardar.');});
     if(callback)callback();
   }
-
+ 
   function descargarReporte(){
-    var desde=document.getElementById('fecha-desde').value;
-    var hasta=document.getElementById('fecha-hasta').value;
+    var desde=document.getElementById('fecha-desde').value;var hasta=document.getElementById('fecha-hasta').value;
     if(!desde||!hasta){alert('Por favor selecciona las fechas.');return;}
     function conv(f){var p=f.split('-');return p[2]+'-'+p[1]+'-'+p[0];}
     window.location.href=API+'/reporte?desde='+conv(desde)+'&hasta='+conv(hasta);
   }
-
+ 
   (function(){
-    var hoy=new Date();
-    var yyyy=hoy.getFullYear(),mm=String(hoy.getMonth()+1).padStart(2,'0'),dd=String(hoy.getDate()).padStart(2,'0');
+    var hoy=new Date();var yyyy=hoy.getFullYear(),mm=String(hoy.getMonth()+1).padStart(2,'0'),dd=String(hoy.getDate()).padStart(2,'0');
     document.getElementById('fecha-hasta').value=yyyy+'-'+mm+'-'+dd;
     var lunes=new Date(hoy);lunes.setDate(hoy.getDate()-hoy.getDay()+1);
     document.getElementById('fecha-desde').value=lunes.getFullYear()+'-'+String(lunes.getMonth()+1).padStart(2,'0')+'-'+String(lunes.getDate()).padStart(2,'0');
   })();
-
+ 
   verificarServidor();
 </script>
 </body>
